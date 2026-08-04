@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "GestureCTRL Bridge",
+  "name": "NT Console Bridge",
   "version": "1.0.0",
-  "description": "Receives gesture commands from the GestureCTRL web app and converts them into real keyboard, mouse, scroll, and fullscreen events on your active tab. Works with Poki, YouTube, Google Slides, Canva, and any HTML5 game.",
+  "description": "Receives gesture commands from the NT Console web app and converts them into real keyboard, mouse, scroll, and fullscreen events on your active tab. Works with Poki, YouTube, Google Slides, Canva, and any HTML5 game.",
   "permissions": ["tabs", "storage", "activeTab", "scripting"],
   "host_permissions": ["<all_urls>"],
   "background": {
@@ -17,17 +17,17 @@
     }
   ],
   "action": {
-    "default_title": "GestureCTRL Bridge",
+    "default_title": "NT Console Bridge",
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icons/icon-16.png",
-      "48": "icons/icon-48.png",
-      "128": "icons/icon-128.png"
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
     }
   },
   "icons": {
-    "16": "icons/icon-16.png",
-    "48": "icons/icon-48.png",
-    "128": "icons/icon-128.png"
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
   }
 }

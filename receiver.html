@@ -3,26 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GestureCTRL — Demo Receiver Tab</title>
-<link rel="icon" href="icons/icon-192.png">
+<title>NT Console — Demo Receiver Tab</title>
+<link rel="icon" href="icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
   body{ padding:32px; }
   .demo-stage{ max-width:900px; margin:0 auto; }
+  .topbar-demo{ justify-content:center; margin-bottom:20px; }
+  .topbar-demo .topbar-center{ text-align:center; }
   .demo-video{ width:100%; aspect-ratio:16/9; border-radius:var(--radius-lg); border:1px solid var(--border); background:linear-gradient(135deg,#0a0e1a,#1a0f2e); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
   .demo-cursor{ position:absolute; width:60px; height:60px; border:2px solid var(--cyan); border-radius:50%; transition:transform .18s ease, left .12s linear, top .12s linear; left:50%; top:50%; transform:translate(-50%,-50%); box-shadow:0 0 30px var(--cyan); }
   .demo-title{ font-family:var(--font-display); font-size:26px; text-align:center; z-index:2; }
   .demo-badge{ position:absolute; top:16px; right:16px; }
   .demo-controls{ display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
   .demo-status{ text-align:center; margin-top:10px; font-family:var(--font-mono); font-size:12px; color:var(--text-2); }
+  .demo-cursor.hidden{ display:none; }
+  .demo-panel-spaced{ margin-top:20px; }
 </style>
 </head>
 <body data-theme="dark">
 <canvas id="particles"></canvas>
 <div class="demo-stage">
-  <div class="topbar" style="justify-content:center; margin-bottom:20px;">
-    <div style="text-align:center;">
+  <div class="topbar topbar-demo">
+    <div class="topbar-center">
       <div class="page-title">Demo Receiver Tab</div>
       <div class="page-sub">Listening on the same BroadcastChannel as the controller tab</div>
     </div>
@@ -31,12 +35,12 @@
   <div class="demo-video" id="demoVideo">
     <span class="badge connected demo-badge" id="linkBadge">Waiting…</span>
     <div class="demo-title" id="demoState">▶ PLAYING — demo content</div>
-    <div class="demo-cursor" id="demoCursor" style="display:none;"></div>
+    <div class="demo-cursor hidden" id="demoCursor"></div>
   </div>
 
   <div class="demo-status" id="demoStatus">No commands received yet — perform a gesture in the controller tab.</div>
 
-  <div class="panel" style="margin-top:20px;">
+  <div class="panel demo-panel-spaced">
     <div class="panel-title">Received command log</div>
     <div class="log scrollbar-thin" id="demoLog"></div>
   </div>

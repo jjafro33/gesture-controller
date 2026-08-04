@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NT Console Bridge</title>
 <style>
   :root{
     --bg:#0a0e1a; --panel:#0f1424; --border:rgba(255,255,255,0.1); --cyan:#00f0ff; --violet:#b026ff;
@@ -10,8 +12,10 @@
   *{box-sizing:border-box;}
   body{ width:300px; margin:0; background:var(--bg); color:var(--text0); font-family:'Segoe UI',Inter,sans-serif; padding:16px; }
   h1{ font-size:14px; margin:0 0 4px; letter-spacing:.04em; }
+  .brand-ctrl{ color:var(--cyan); }
   .sub{ font-size:11px; color:var(--text1); margin-bottom:14px; }
   .row{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid var(--border); font-size:12.5px; }
+  .row.target-row{ flex-direction:column; align-items:flex-start; gap:4px; }
   .row:first-of-type{ border-top:none; }
   .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
   .on{ background:var(--green); box-shadow:0 0 6px var(--green); }
@@ -32,17 +36,17 @@
 </style>
 </head>
 <body>
-  <h1>GESTURE<span style="color:var(--cyan)">CTRL</span> Bridge</h1>
+  <h1>NT <span class="brand-ctrl">Console</span> Bridge</h1>
   <div class="sub">Converts gestures into real page events</div>
 
   <div class="row"><span><span class="dot" id="dotBridge"></span>Bridge status</span><span id="bridgeEnabled">Enabled</span></div>
   <div class="row"><span>Gesture actions received</span><span id="cmdCount">0</span></div>
-  <div class="row" style="flex-direction:column; align-items:flex-start; gap:4px;">
+  <div class="row target-row">
     <span>Current target tab</span>
     <span class="target" id="targetLabel">None selected</span>
   </div>
   <div class="row"><span>Enable bridge</span>
-    <span class="switch"><input type="checkbox" id="toggleEnabled" checked><span class="slider"></span></span>
+    <span class="switch"><input type="checkbox" id="toggleEnabled" checked title="Enable bridge" aria-label="Enable bridge"><span class="slider"></span></span>
   </div>
 
   <button id="btnSetTarget">🎯 Set this tab as gesture target</button>
