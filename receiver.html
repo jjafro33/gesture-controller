@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GestureCTRL — Demo Receiver Tab</title>
+<link rel="icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body{ padding:32px; }
+  .demo-stage{ max-width:900px; margin:0 auto; }
+  .demo-video{ width:100%; aspect-ratio:16/9; border-radius:var(--radius-lg); border:1px solid var(--border); background:linear-gradient(135deg,#0a0e1a,#1a0f2e); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  .demo-cursor{ position:absolute; width:60px; height:60px; border:2px solid var(--cyan); border-radius:50%; transition:transform .18s ease, left .12s linear, top .12s linear; left:50%; top:50%; transform:translate(-50%,-50%); box-shadow:0 0 30px var(--cyan); }
+  .demo-title{ font-family:var(--font-display); font-size:26px; text-align:center; z-index:2; }
+  .demo-badge{ position:absolute; top:16px; right:16px; }
+  .demo-controls{ display:flex; gap:10px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
+  .demo-status{ text-align:center; margin-top:10px; font-family:var(--font-mono); font-size:12px; color:var(--text-2); }
+</style>
+</head>
+<body data-theme="dark">
+<canvas id="particles"></canvas>
+<div class="demo-stage">
+  <div class="topbar" style="justify-content:center; margin-bottom:20px;">
+    <div style="text-align:center;">
+      <div class="page-title">Demo Receiver Tab</div>
+      <div class="page-sub">Listening on the same BroadcastChannel as the controller tab</div>
+    </div>
+  </div>
+
+  <div class="demo-video" id="demoVideo">
+    <span class="badge connected demo-badge" id="linkBadge">Waiting…</span>
+    <div class="demo-title" id="demoState">▶ PLAYING — demo content</div>
+    <div class="demo-cursor" id="demoCursor" style="display:none;"></div>
+  </div>
+
+  <div class="demo-status" id="demoStatus">No commands received yet — perform a gesture in the controller tab.</div>
+
+  <div class="panel" style="margin-top:20px;">
+    <div class="panel-title">Received command log</div>
+    <div class="log scrollbar-thin" id="demoLog"></div>
+  </div>
+</div>
+
+<script src="settings.js"></script>
+<script>
+  const channelName = new URLSearchParams(location.search).get('channel') || Settings.get('channelName');
+  const channel = new BroadcastChannel(channelName);
+  const stage = document.getElementById('demoVideo');
+  const stateEl = document.getElementById('demoState');
+  const statusEl = document.getElementById('demoStatus');
+  const cursor = document.getElementById('demoCursor');
+  const logEl = document.getElementById('demoLog');
+  const badge = document.getElementById('linkBadge');
+  let playing = true, volume = 50, zoom = 1, rotation = 0;
+
+  badge.textContent = 'Linked · ' + channelName;
+
+  function log(msg){
+    const row = document.createElement('div');
+    row.className = 'log-row';
+    row.innerHTML = `<span class="t">${new Date().toLocaleTimeString()}</span><span>${msg}</span>`;
+    logEl.prepend(row);
+  }
+
+  function setState(txt){ stateEl.textContent = txt; }
+
+  channel.onmessage = (ev) => {
+    const cmd = ev.data;
+    if (!cmd || cmd.source !== 'gesturectrl') return;
+    statusEl.textContent = `Last: ${cmd.gesture} → ${cmd.label || cmd.action}`;
+    log(`${cmd.gesture} → <b>${cmd.label || cmd.action}</b> (${cmd.actionType})`);
+
+    if (cmd.actionType === 'key') {
+      switch (cmd.action) {
+        case 'Space': playing = !playing; setState(playing ? '▶ PLAYING — demo content' : '⏸ PAUSED'); break;
+        case 'ArrowRight': setState('⏭ SKIPPED FORWARD'); break;
+        case 'ArrowLeft': setState('⏮ SKIPPED BACK'); break;
+        case 'ArrowUp': volume = Math.min(100, volume + 10); setState(`🔊 VOLUME ${volume}%`); break;
+        case 'ArrowDown': volume = Math.max(0, volume - 10); setState(`🔉 VOLUME ${volume}%`); break;
+        case 'Escape': setState('⛶ EXITED FULLSCREEN'); break;
+        case 'KeyF': stage.requestFullscreen?.().catch(()=>{}); setState('⛶ FULLSCREEN'); break;
+        case 'KeyR': setState('🔄 RELOADED'); break;
+        case 'KeyM': setState('🔇 MUTED'); break;
+        case 'Equal': zoom = Math.min(3, zoom + 0.2); setState(`🔍 ZOOM ${zoom.toFixed(1)}x`); break;
+        case 'Minus': zoom = Math.max(0.5, zoom - 0.2); setState(`🔎 ZOOM ${zoom.toFixed(1)}x`); break;
+        case 'KeyE': rotation += 20; setState(`🔄 ROTATED ${rotation}°`); break;
+        case 'KeyQ': rotation -= 20; setState(`🔃 ROTATED ${rotation}°`); break;
+        default: setState(`KEY: ${cmd.action}`);
+      }
+    } else if (cmd.actionType === 'mouse') {
+      cursor.style.display = 'block';
+      if (cmd.action === 'click') { cursor.style.transform = 'translate(-50%,-50%) scale(0.6)'; setState('🖱 CLICK'); setTimeout(()=>cursor.style.transform='translate(-50%,-50%) scale(1)', 150); }
+      else if (cmd.action === 'dblclick') { setState('🖱 DOUBLE CLICK'); }
+    } else if (cmd.actionType === 'system') {
+      setState('PING ✓');
+    }
+  };
+</script>
+</body>
+</html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NT Console</title>
+<meta name="description" content="NT Console brings gesture control to your browser workspace with live camera tracking and tab linking.">
+<meta name="color-scheme" content="dark light">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-theme="dark" data-hand="right">
+
+<canvas id="particles"></canvas>
+<div class="cursor-dot" id="virtualCursor"></div>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><img src="icon.png" alt="NT Console"></div>
+      <div>
+        <div class="brand-name">NT CONSOLE</div>
+        <div class="brand-sub">CROSS-TAB CONTROL</div>
+      </div>
+    </div>
+
+    <ul class="nav" id="navList">
+      <li class="nav-item active" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Dashboard</span></li>
+      <li class="nav-item" data-view="camera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg><span>Camera</span></li>
+      <li class="nav-item" data-view="mapping"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12"/></svg><span>Gesture Map</span></li>
+      <li class="nav-item" data-view="gaming"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"/></svg><span>Gaming Mode</span></li>
+      <li class="nav-item" data-view="games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h4M10 10v4M15.5 13h.01M17 11h.01"/></svg><span>Games</span></li>
+      <li class="nav-item" data-view="mouse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="6"/><path d="M12 6v4"/></svg><span>Mouse Control</span></li>
+      <li class="nav-item" data-view="trainer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-6"/></svg><span>Gesture Trainer</span></li>
+      <li class="nav-item" data-view="connect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 5.64a9 9 0 11-12.73 0M12 2v10"/></svg><span>Connect Tabs</span></li>
+      <li class="nav-item" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Settings</span></li>
+    </ul>
+
+    <div class="sidebar-foot">
+      <div class="status-pill"><span class="dot off" id="dotCamera"></span> CAMERA</div>
+      <div class="status-pill"><span class="dot off" id="dotHand"></span> HAND TRACK</div>
+      <div class="status-pill"><span class="dot off" id="dotChannel"></span> TAB LINK</div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- ---------- DASHBOARD ---------- -->
+    <section class="view active" id="view-dashboard">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Live overview of camera, hand tracking, and connected tab</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-primary" id="btnQuickStart">▶ Start Camera</button>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="camera-wrap" id="cameraWrapDash">
+          <div class="camera-idle" id="cameraIdleDash">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <div>Camera is off — press Start to begin gesture tracking</div>
+          </div>
+          <video id="video" autoplay muted class="mirror"></video>
+          <canvas id="overlay" class="mirror"></canvas>
+          <div class="hud">
+            <div class="hud-chip">FPS <span id="fpsCounter">0</span></div>
+            <div class="hud-chip"><span id="handsCounter">0</span> HAND(S)</div>
+          </div>
+          <div class="gesture-banner hidden" id="gestureBanner">
+            <span id="gestureBannerName">—</span><span class="conf" id="gestureBannerConf">0%</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Live Stats</div>
+          <div class="stat-list">
+            <div class="stat-row"><span class="k">Camera status</span><span class="v off" id="statCamera">Offline</span></div>
+            <div class="stat-row"><span class="k">FPS</span><span class="v mono" id="statFps">0</span></div>
+            <div class="stat-row"><span class="k">Detected gesture</span><span class="v" id="statGesture">None</span></div>
+            <div class="stat-row"><span class="k">Confidence</span><span class="v mono" id="statConf">0%</span></div>
+            <div class="stat-row"><span class="k">Left hand</span><span class="v" id="statLeft">Not detected</span></div>
+            <div class="stat-row"><span class="k">Right hand</span><span class="v" id="statRight">Not detected</span></div>
+            <div class="stat-row"><span class="k">Connected website</span><span class="v" id="statSite">None</span></div>
+            <div class="stat-row"><span class="k">Extension</span><span class="v" id="statExt">Not detected</span></div>
+            <div class="stat-row"><span class="k">Current action</span><span class="v mono" id="statAction">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-2 panel-top-gap">
+        <div class="panel">
+          <div class="panel-title">Action Log <span class="badge" id="logCount">0 events</span></div>
+          <div class="log scrollbar-thin" id="actionLog"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Recognizable Gestures</div>
+          <div class="gesture-grid" id="gestureLegend"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- CAMERA ---------- -->
+    <section class="view" id="view-camera">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Camera &amp; Hand Tracking</div>
+          <div class="page-sub">Full HD feed, landmark skeleton, per-hand confidence</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn" id="btnMirror">⇋ Mirror: On</button>
+          <button class="btn" id="btnSkeleton">✋ Skeleton: On</button>
+          <button class="btn btn-primary" id="btnToggleCamera">▶ Start Camera</button>
+        </div>
+      </div>
+
+      <div class="stage-grid">
+        <div class="camera-wrap" id="cameraWrapFull">
+          <div class="camera-idle" id="cameraIdleFull">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            <div>Camera is off</div>
+          </div>
+          <div class="hud">
+            <div class="hud-chip">FPS <span id="fpsCounter2">0</span></div>
+            <div class="hud-chip"><span id="handsCounter2">0</span> HAND(S)</div>
+          </div>
+          <div class="gesture-banner hidden" id="gestureBanner2">
+            <span id="gestureBannerName2">—</span><span class="conf" id="gestureBannerConf2">0%</span>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Hand Detail</div>
+          <div class="stat-list" id="handDetailList">
+            <div class="stat-row"><span class="k">Left hand</span><span class="v" id="camLeft">Not detected</span></div>
+            <div class="stat-row"><span class="k">Right hand</span><span class="v" id="camRight">Not detected</span></div>
+            <div class="stat-row"><span class="k">Landmarks / hand</span><span class="v mono">21</span></div>
+            <div class="stat-row"><span class="k">Model</span><span class="v mono">MediaPipe Hands</span></div>
+          </div>
+          <div class="panel-title panel-title-spaced">Camera Device</div>
+          <div class="field">
+            <select id="cameraSelect" title="Camera device selector" aria-label="Camera device selector"></select>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- GESTURE MAPPING ---------- -->
+    <section class="view" id="view-mapping">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Gesture Mapping</div>
+          <div class="page-sub">Assign each gesture to a keyboard, mouse, or system action</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn" id="btnResetMap">↺ Reset defaults</button>
+          <button class="btn btn-primary" id="btnSaveMap">💾 Save mapping</button>
+        </div>
+      </div>
+      <div class="panel">
+        <table class="map-table" id="mapTable">
+          <thead><tr><th>Gesture</th><th>Action type</th><th>Action</th><th>Enabled</th></tr></thead>
+          <tbody id="mapTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- GAMING MODE ---------- -->
+    <section class="view" id="view-gaming">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Gaming Mode</div>
+          <div class="page-sub">Preset gesture scheme tuned for HTML5 games (Poki, itch.io, etc.)</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-primary" id="btnApplyGamingPreset">🎮 Apply gaming preset</button>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title">Preset scheme</div>
+          <div class="gesture-grid" id="gamingPresetList"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Test target</div>
+          <p class="muted muted-copy">
+            Open a game in another tab (e.g. a Poki game or any HTML5 game), then go to <b>Connect Tabs</b> to link this
+            controller to it. With the browser extension installed, gestures are converted into real keyboard/mouse/wheel
+            events on that tab.
+          </p>
+          <button class="btn btn-spaced" data-nav="connect">Go to Connect Tabs →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- GAMES ---------- -->
+    <section class="view" id="view-games">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Games</div>
+          <div class="page-sub">Built-in gesture-controlled games — the camera stays on screen while you play</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn" id="btnGameReset">↺ Restart</button>
+          <button class="btn btn-primary" id="btnGameToggle" disabled>▶ Start Game</button>
+        </div>
+      </div>
+
+      <div class="game-picker" id="gamePicker"></div>
+
+      <div class="games-split">
+        <div class="panel">
+          <div class="panel-title"><span id="gameTitle">Pick a game above</span><span class="badge mono" id="gameScoreBadge">Score 0</span></div>
+          <div class="game-canvas-wrap" id="gameCanvasWrap">
+            <canvas id="gameCanvas"></canvas>
+            <div class="game-overlay-msg" id="gameOverlayMsg">
+              <div>
+                <div id="gameOverlayTitle" class="game-overlay-title">Select a game to begin</div>
+                <div id="gameOverlaySub" class="muted game-overlay-sub">Choose one of the cards above, start your camera on the right, then hit Start Game.</div>
+              </div>
+            </div>
+          </div>
+          <div class="game-instructions" id="gameInstructions"></div>
+        </div>
+
+        <div class="panel game-cam-panel">
+          <div class="panel-title">Gesture Controller <span class="badge" id="gameCamBadge">Camera off</span></div>
+          <div class="camera-wrap game-cam-wrap" id="cameraWrapGames">
+            <div class="camera-idle" id="cameraIdleGames">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+              <div>Camera is off</div>
+            </div>
+            <div class="hud">
+              <div class="hud-chip">FPS <span id="fpsCounter3">0</span></div>
+              <div class="hud-chip"><span id="handsCounter3">0</span> HAND(S)</div>
+            </div>
+            <div class="gesture-banner hidden" id="gestureBanner3">
+              <span id="gestureBannerName3">—</span><span class="conf" id="gestureBannerConf3">0%</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-wide" id="btnGameCamStart">▶ Start Camera</button>
+          <div class="stat-list stat-list-spaced">
+            <div class="stat-row"><span class="k">Live gesture</span><span class="v" id="gameLiveGesture">None</span></div>
+            <div class="stat-row"><span class="k">Status</span><span class="v mono" id="gameMeta">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-top-gap">
+        <div class="panel-title">More gesture-controlled games from around the web <span class="badge">opens in a new tab</span></div>
+        <p class="muted muted-copy-sm">
+          Built by other developers, hosted on their own sites — since they're a different origin, this app can't
+          split-screen or auto-detect gestures inside them the way it does with the games above. Most read your
+          webcam directly once you open them. For keyboard-driven ones, you can also come back to <b>Connect Tabs</b>
+          and use the browser extension to target that tab with your own gesture map.
+        </p>
+        <div class="ext-game-grid" id="extGameGrid"></div>
+      </div>
+    </section>
+
+    <!-- ---------- MOUSE CONTROL ---------- -->
+    <section class="view" id="view-mouse">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Mouse Control</div>
+          <div class="page-sub">Point with your index finger to move the cursor; pinch to click</div>
+        </div>
+        <div class="topbar-actions">
+          <label class="toggle-row toggle-row-compact" for="mouseEnable">
+            <span class="toggle-text">Enable virtual mouse</span>
+            <span class="switch"><input type="checkbox" id="mouseEnable" aria-label="Enable virtual mouse" title="Enable virtual mouse"><span class="slider-tog"></span></span>
+          </label>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title">How it works</div>
+          <div class="stat-list">
+            <div class="stat-row"><span class="k">Move cursor</span><span class="v">Index finger tip position</span></div>
+            <div class="stat-row"><span class="k">Left click</span><span class="v">Pinch (thumb + index)</span></div>
+            <div class="stat-row"><span class="k">Right click</span><span class="v">Pinch (thumb + middle)</span></div>
+            <div class="stat-row"><span class="k">Double click</span><span class="v">Double pinch (index)</span></div>
+            <div class="stat-row"><span class="k">Drag / drop</span><span class="v">Hold pinch + move, release</span></div>
+            <div class="stat-row"><span class="k">Scroll</span><span class="v">Swipe up / down with open palm</span></div>
+          </div>
+          <p class="muted muted-copy-tight">
+            On this page the cursor is a visual overlay only. With the browser extension enabled on a target tab,
+            the same events drive a real synthetic cursor there.
+          </p>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Sensitivity</div>
+          <div class="field">
+            <label>Cursor smoothing</label>
+            <input type="range" id="cursorSmoothing" min="0" max="0.95" step="0.05" value="0.6" title="Cursor smoothing" aria-label="Cursor smoothing">
+          </div>
+          <div class="field">
+            <label>Pinch threshold</label>
+            <input type="range" id="pinchThreshold" min="0.02" max="0.12" step="0.005" value="0.055" title="Pinch threshold" aria-label="Pinch threshold">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- TRAINER ---------- -->
+    <section class="view" id="view-trainer">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Gesture Trainer</div>
+          <div class="page-sub">Record, name, and train your own custom hand poses</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn" id="btnExportModel">⭳ Export model</button>
+          <button class="btn" id="btnImportModel">⭱ Import model</button>
+          <input type="file" id="importModelFile" accept="application/json" hidden>
+        </div>
+      </div>
+      <div class="trainer-grid">
+        <div class="panel">
+          <div class="panel-title">Record new gesture</div>
+          <div class="field">
+            <label>Gesture name</label>
+            <input type="text" id="trainerName" placeholder="e.g. Spider-Man Sign">
+          </div>
+          <div class="field">
+            <label>Map to action key (optional)</label>
+            <input type="text" id="trainerKey" placeholder="e.g. Space, ArrowUp, KeyF">
+          </div>
+          <button class="btn btn-primary btn-wide" id="btnRecordGesture">⬤ Hold pose &amp; Record (2s)</button>
+          <div class="field field-spaced">
+            <label>Recording status</label>
+            <div class="stat-row"><span class="k" id="trainerStatus">Idle</span><span class="v mono" id="trainerProgress">0%</span></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Saved custom gestures <span class="badge" id="savedCount">0</span></div>
+          <div class="saved-gestures scrollbar-thin" id="savedGesturesList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- CONNECT TABS ---------- -->
+    <section class="view" id="view-connect">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Connect Tabs</div>
+          <div class="page-sub">Link this controller to another tab in real time</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title">Method 1 — Same-site demo channel <span class="badge connected" id="badgeChannel">BroadcastChannel</span></div>
+          <p class="muted muted-copy">
+            Works instantly between two tabs of <i>this same site</i> (e.g. this controller + the bundled
+            <code>receiver.html</code> demo tab). Open the receiver, then perform gestures here.
+          </p>
+          <div class="connect-actions">
+            <button class="btn btn-primary" id="btnOpenReceiver">↗ Open demo receiver tab</button>
+            <button class="btn" id="btnPingChannel">Ping channel</button>
+          </div>
+          <div class="field field-spaced-lg">
+            <label for="channelName">Channel name</label>
+            <input type="text" id="channelName" value="gesture-control-channel" title="Channel name" aria-label="Channel name">
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Method 2 — Any tab, via extension <span class="badge" id="badgeExt">Not detected</span></div>
+          <p class="muted muted-copy">
+            Install <b>GestureCTRL Bridge</b> (folder <code>/extension</code>) as an unpacked Chrome/Edge extension.
+            It receives commands from this page and turns them into real keyboard, mouse, wheel, and fullscreen
+            events on the active tab — works on Poki, YouTube, Google Slides, Canva, or any HTML5 game.
+          </p>
+          <ol class="connect-list">
+            <li>Open <code>chrome://extensions</code></li>
+            <li>Enable <b>Developer mode</b></li>
+            <li>Click <b>Load unpacked</b> → select the <code>extension/</code> folder</li>
+            <li>Open your target tab (Poki, YouTube…) and switch to it</li>
+            <li>Come back here — gestures now control that tab</li>
+          </ol>
+          <button class="btn btn-spaced" id="btnCheckExt">🔌 Check extension connection</button>
+        </div>
+      </div>
+
+      <div class="panel panel-top-gap">
+        <div class="panel-title">Live relay log</div>
+        <div class="log scrollbar-thin" id="relayLog"></div>
+      </div>
+    </section>
+
+    <!-- ---------- SETTINGS ---------- -->
+    <section class="view" id="view-settings">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Settings</div>
+          <div class="page-sub">Camera, sensitivity, appearance and key bindings</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-title">General</div>
+          <div class="field">
+            <label>Theme</label>
+            <div class="pill-tabs" id="themeTabs">
+              <div class="pill-tab active" data-theme="dark">Dark</div>
+              <div class="pill-tab" data-theme="light">Light</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>Handedness</label>
+            <div class="pill-tabs" id="handTabs">
+              <div class="pill-tab active" data-hand="right">Right-handed</div>
+              <div class="pill-tab" data-hand="left">Left-handed</div>
+            </div>
+          </div>
+          <div class="toggle-row">
+            <span>Enable gesture recognition</span>
+            <span class="switch"><input type="checkbox" id="settingEnableGestures" checked aria-label="Enable gesture recognition" title="Enable gesture recognition"><span class="slider-tog"></span></span>
+          </div>
+          <div class="toggle-row">
+            <span>Show hand skeleton overlay</span>
+            <span class="switch"><input type="checkbox" id="settingShowSkeleton" checked aria-label="Show hand skeleton overlay" title="Show hand skeleton overlay"><span class="slider-tog"></span></span>
+          </div>
+          <div class="toggle-row">
+            <span>Mirror camera feed</span>
+            <span class="switch"><input type="checkbox" id="settingMirror" checked aria-label="Mirror camera feed" title="Mirror camera feed"><span class="slider-tog"></span></span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Performance</div>
+          <div class="field">
+            <label>FPS limit: <span id="fpsLimitVal" class="mono">30</span></label>
+            <input type="range" id="fpsLimit" min="10" max="60" step="5" value="30" title="FPS limit" aria-label="FPS limit">
+          </div>
+          <div class="field">
+            <label>Gesture sensitivity: <span id="sensitivityVal" class="mono">0.7</span></label>
+            <input type="range" id="sensitivity" min="0.3" max="0.95" step="0.05" value="0.7" title="Gesture sensitivity" aria-label="Gesture sensitivity">
+          </div>
+          <div class="field">
+            <label>Gesture hold time (ms): <span id="holdTimeVal" class="mono">350</span></label>
+            <input type="range" id="holdTime" min="100" max="1000" step="50" value="350" title="Gesture hold time" aria-label="Gesture hold time">
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-top-gap">
+        <div class="panel-title">Custom key bindings <span class="badge">applies to Gesture Map</span></div>
+        <p class="muted muted-copy-sm">Edit specific key bindings directly from the <b>Gesture Map</b> tab — changes are saved automatically to this browser.</p>
+        <div class="settings-actions">
+          <button class="btn btn-danger" id="btnResetAll">⚠ Reset all settings</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  Built by <a class="site-footer-link" href="https://nublixtech.vercel.app/" target="_blank" rel="noreferrer noopener">Nublix Technologies</a>
+</footer>
+
+<!-- MediaPipe Hands + drawing utils -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+<script src="settings.js"></script>
+<script src="broadcaster.js"></script>
+<script src="gestures.js"></script>
+<script src="controls.js"></script>
+<script src="camera.js"></script>
+<script src="trainer.js"></script>
+<script src="games.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  :root{
+    --bg:#0a0e1a; --panel:#0f1424; --border:rgba(255,255,255,0.1); --cyan:#00f0ff; --violet:#b026ff;
+    --text0:#f2f5fb; --text1:#a9b2c9; --green:#39ff88; --red:#ff3b6b;
+  }
+  *{box-sizing:border-box;}
+  body{ width:300px; margin:0; background:var(--bg); color:var(--text0); font-family:'Segoe UI',Inter,sans-serif; padding:16px; }
+  h1{ font-size:14px; margin:0 0 4px; letter-spacing:.04em; }
+  .sub{ font-size:11px; color:var(--text1); margin-bottom:14px; }
+  .row{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-top:1px solid var(--border); font-size:12.5px; }
+  .row:first-of-type{ border-top:none; }
+  .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
+  .on{ background:var(--green); box-shadow:0 0 6px var(--green); }
+  .off{ background:var(--red); box-shadow:0 0 6px var(--red); }
+  button{
+    width:100%; margin-top:10px; padding:9px; border-radius:8px; border:none; cursor:pointer;
+    font-weight:600; font-size:12.5px; background:linear-gradient(135deg,var(--cyan),var(--violet)); color:#05070d;
+  }
+  button.secondary{ background:rgba(255,255,255,0.08); color:var(--text0); }
+  button.danger{ background:rgba(255,59,107,0.15); color:#ff6b8f; }
+  .target{ font-family:monospace; font-size:11px; color:var(--cyan); word-break:break-all; }
+  .switch{ position:relative; width:36px; height:20px; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .slider{ position:absolute; inset:0; background:rgba(255,255,255,0.1); border-radius:999px; cursor:pointer; transition:.2s;}
+  .slider::before{ content:''; position:absolute; width:14px; height:14px; left:2px; top:2px; background:var(--text1); border-radius:50%; transition:.2s;}
+  input:checked + .slider{ background:linear-gradient(135deg,var(--cyan),var(--violet)); }
+  input:checked + .slider::before{ transform:translateX(16px); background:#05070d;}
+</style>
+</head>
+<body>
+  <h1>GESTURE<span style="color:var(--cyan)">CTRL</span> Bridge</h1>
+  <div class="sub">Converts gestures into real page events</div>
+
+  <div class="row"><span><span class="dot" id="dotBridge"></span>Bridge status</span><span id="bridgeEnabled">Enabled</span></div>
+  <div class="row"><span>Gesture actions received</span><span id="cmdCount">0</span></div>
+  <div class="row" style="flex-direction:column; align-items:flex-start; gap:4px;">
+    <span>Current target tab</span>
+    <span class="target" id="targetLabel">None selected</span>
+  </div>
+  <div class="row"><span>Enable bridge</span>
+    <span class="switch"><input type="checkbox" id="toggleEnabled" checked><span class="slider"></span></span>
+  </div>
+
+  <button id="btnSetTarget">🎯 Set this tab as gesture target</button>
+  <button class="secondary" id="btnClearTarget">Clear target</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>
